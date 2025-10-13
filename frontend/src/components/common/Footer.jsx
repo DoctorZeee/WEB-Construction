@@ -6,7 +6,7 @@ export const Footer = () => {
             <div className="container py-5">
                 <div className="row">
                     <div className="col-md-3">
-                        <h3>Dimas Web</h3>
+                        <h3 className="mb-3">Dimas Web</h3>
                         <div className="pe-5"></div>
                         <p>
                             Our post-construction services ives you peace of
