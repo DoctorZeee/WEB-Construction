@@ -1,5 +1,4 @@
 import React from "react";
-import AboutImg from "../../assets/images/about-us.jpg";
 import Header from "../common/Header";
 import Footer from "../common/Footer";
 import ServiceImg from "../../assets/images/construction1.jpg";
@@ -13,12 +12,13 @@ import "swiper/css";
 import "swiper/css/pagination";
 import AvatarImg from "../../assets/images/author-2.jpg";
 import { Pagination } from "swiper/modules";
+import About from "../common/About";
 
 export const Home = () => {
     return (
         <>
             <Header />
-            
+
             <main>
                 {/* Hero Section */}
                 <section className="section-1">
@@ -50,38 +50,7 @@ export const Home = () => {
                 </section>
 
                 {/* About Us Section */}
-                <section className="section-2 py-5">
-                    <div className="container py-5">
-                        <div className="row">
-                            <div className="col-md-6">
-                                <img src={AboutImg} className="w-100" />
-                            </div>
-
-                            <div className="col-md-6">
-                                <span>About Us</span>
-                                <h2>
-                                    Crafting structures that last a lifetime
-                                </h2>
-                                <p>
-                                    Building enduring structures requires
-                                    comprehensive aproach that combines advanced
-                                    materials, resilient design, routine
-                                    maintence, and sustainable practices. By
-                                    drawing on historical insight and utilizing
-                                    modern technology.
-                                </p>
-                                <p>
-                                    Designing structures that stand he test of
-                                    the time involves a seamless blend of
-                                    cutting-edge materials, durable design,
-                                    ongoing upkeep, and eco-friendly practices.
-                                    By combining lesson from the past with the
-                                    power of modern technology
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                <About />
 
                 {/*Our Services*/}
                 <section className="section-3 bg-light py-5">
@@ -900,7 +869,6 @@ export const Home = () => {
                         </div>
                     </div>
                 </section>
-
             </main>
 
             <Footer />
