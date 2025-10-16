@@ -9,12 +9,12 @@ const Sidebar = () => {
                 <div className="card-body p-4 sidebar">
                     <h4>Sidebar</h4>
                     <ul>
-                      <li>
+                      <ul>
                         <li><a href="#">Dashboard</a></li>
                         <li><a href="#">Services</a></li>
                         <li><a href="#">Projects</a></li>
                         <li><a href="#">Articles</a></li>
-                      </li>
+                      </ul>
                       <button onClick={logout} className="btn btn-primary mt-4">Log Out</button>
                     </ul>
                 </div>
