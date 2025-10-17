@@ -4,28 +4,52 @@ import Footer from "../../common/Footer";
 import Sidebar from "../../common/Sidebar";
 import { apiUrl, token } from "../../common/http";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Show = () => {
 
-  const [services, setServices] = useState([]);
+    const [services, setServices] = useState([]);
 
-  const fetchServices = async () => {
-    const res = await fetch(apiUrl+'services',{
-      'method' : 'GET',
-      'headers' : {
-        'Content-Type': 'application/json',
-        'Accept' : 'application/json',
-        'Authorization' : `Bearer ${token()}`
-      }
-    });
+    const fetchServices = async () => {
+        const res = await fetch(apiUrl + 'services', {
+            'method': 'GET',
+            'headers': {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: `Bearer ${token()}`
+            }
+        });
 
-    const result = await res.json();
-    setServices(result.data);
-  }
+        const result = await res.json();
+        setServices(result.data);
+    }
 
-  useEffect (()=>{
-    fetchServices();
-  },[]);
+    const deleteService = async (id) => {
+
+        if (confirm("Are You Sure You Want To Delete?")) {
+            const res = await fetch(apiUrl + 'services/' + id, {
+                'method': 'DELETE',
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token()}`
+                }
+            });
+            const result = await res.json();
+
+            if(result.status == true){
+                const newServices = services.filter(service => service.id != id)
+                setServices(newServices);
+                toast.success(result.message);
+            } else {
+                toast.error(result.message);
+            }
+        }
+    }
+
+    useEffect(() => {
+        fetchServices();
+    }, []);
 
     return (
         <>
@@ -72,14 +96,14 @@ const Show = () => {
                                                                 }
                                                             </td>
                                                             <td>
-                                                                <a href="" className="btn btn-primary btn-sm">Edit</a>
-                                                                <a href="" className="btn btn-secondary btn-sm ms-2">Delete</a>
+                                                                <Link to={`/admin/services/edit/${service.id}`} className="btn btn-primary btn-sm">Edit</Link>
+                                                                <Link onClick={()=>deleteService(service.id)} href="#" className="btn btn-secondary btn-sm ms-2">Delete</Link>
                                                             </td>
                                                         </tr>
                                                     )
                                                 })
                                             }
-                                            
+
                                         </tbody>
                                     </table>
                                 </div>

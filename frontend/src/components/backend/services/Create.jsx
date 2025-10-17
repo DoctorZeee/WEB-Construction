@@ -11,6 +11,8 @@ import JoditEditor from "jodit-react";
 const Create = ({placeholder}) => {
     const editor = useRef(null);
     const [content, setContent] = useState("");
+    const [isDisable, setIsDisable] = useState(false);
+    const [imageId, setImageId] = useState(null);
 
     const config = useMemo(
         () => ({
@@ -28,7 +30,7 @@ const Create = ({placeholder}) => {
     } = useForm();
     const navigate = useNavigate();
     const onSubmit = async (data) => {
-        const newData = {...data,"content":content}
+        const newData = {...data,"content":content, "imageId":imageId}
         const res = await fetch(apiUrl + "services", {
             method: "POST",
             headers: {
@@ -48,6 +50,30 @@ const Create = ({placeholder}) => {
             toast.error(result.message);
         }
     };
+
+    const handleFile = async (e) => {
+        const formData = new FormData();
+        const file = e.target.files[0];
+        formData.append("image",file);
+
+        // https://web-project.ddev.site/api/temp-images
+        await fetch(apiUrl + "temp-images", {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${token()}`,
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(result => {
+            if(result.status == false){
+                toast.error(result.errors.image[0]);
+            }else{
+                setImageId(result.data.id)
+            }
+        });
+    }
 
     return (
         <>
@@ -161,6 +187,16 @@ const Create = ({placeholder}) => {
                                                 htmlFor=""
                                                 className="form-label"
                                             >
+                                                Image
+                                            </label>
+                                            <br />
+                                            <input onChange={handleFile} type="file" />
+                                        </div>
+                                        <div className="mb-3">
+                                            <label
+                                                htmlFor=""
+                                                className="form-label"
+                                            >
                                                 Status
                                             </label>
                                             <select
@@ -173,7 +209,7 @@ const Create = ({placeholder}) => {
                                                 <option value="0">Block</option>
                                             </select>
                                         </div>
-                                        <button className="btn btn-primary">
+                                        <button disabled={isDisable} className="btn btn-primary">
                                             Submit
                                         </button>
                                     </form>
