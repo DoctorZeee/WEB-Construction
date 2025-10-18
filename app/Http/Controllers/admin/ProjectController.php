@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Service;
+use App\Models\Project;
 use App\Models\TempImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -12,32 +12,27 @@ use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 
-class ServiceController extends Controller
+class ProjectController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // This method will return all projects
     public function index()
     {
-        $services = Service::orderBy('created_at', 'DESC')->get();
-
+        $projects = Project::orderBy('created_at', 'DESC')->get();
         return response()->json([
             'status' => true,
-            'data' => $services,
+            'data' => $projects
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // This method willinsert a project in db
     public function store(Request $request)
     {
+        // Str::slug('Dummy Title') = 'dummy-title';
         $request->merge(['slug' => Str::slug($request->slug)]);
         $validator = Validator::make($request->all(), [
             'title' => 'required',
-            'slug' => 'required|unique:services,slug',
+            'slug' => 'required|unique:projects,slug'
         ]);
-
         if ($validator->fails()) {
             return response()->json([
                 'status' => false,
@@ -45,98 +40,67 @@ class ServiceController extends Controller
             ]);
         }
 
-        $model = new Service();
-        $model->title = $request->title;
-        $model->short_desc = $request->short_desc;
-        $model->slug = Str::slug($request->slug);
-        $model->content = $request->content;
-        $model->status = $request->status;
-        $model->save();
+        $project = new Project();
+        $project->title = $request->title;
+        $project->slug = Str::slug($request->slug);
+        $project->short_desc = $request->short_desc;
+        $project->content = $request->content;
+        $project->construction_type = $request->construction_type;
+        $project->sector = $request->sector;
+        $project->status = $request->status;
+        $project->location = $request->location;
+        $project->save();
 
-        //Save TempImg Here
         if ($request->imageId > 0) {
             $tempImage = TempImage::find($request->imageId);
             if ($tempImage != null) {
                 $extArray = explode('.', $tempImage->name);
                 $ext = last($extArray);
 
-                $fileName = strtotime('now') . $model->id . '.' . $ext;
+                $fileName = strtotime('now') . $project->id . '.' . $ext;
 
                 // Create Small Thumbnail Here
                 $sourcePath = public_path('uploads/temp/' . $tempImage->name);
-                $destPath = public_path('uploads/services/small/' . $fileName);
+                $destPath = public_path('uploads/projects/small/' . $fileName);
                 $manager = new ImageManager(Driver::class);
                 $image = $manager->read($sourcePath);
                 $image->coverDown(500, 600);
                 $image->save($destPath);
 
                 // Create Large Thumbnail Here
-                $destPath = public_path('uploads/services/large/' . $fileName);
+                $destPath = public_path('uploads/projects/large/' . $fileName);
                 $manager = new ImageManager(Driver::class);
                 $image = $manager->read($sourcePath);
                 $image->scaleDown(1200);
                 $image->save($destPath);
 
-                $model->image = $fileName;
-                $model->save();
+                $project->image = $fileName;
+                $project->save();
             }
         }
 
         return response()->json([
             'status' => true,
-            'message' => 'Service Added Successfully'
+            'errors' => 'Project Added Sucessfully'
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show($id)
+    public function update($id, Request $request)
     {
-        $service = Service::find($id);
+        $project = Project::find($id);
 
-        if ($service == null) {
+        if ($project == null) {
             return response()->json([
                 'status' => false,
-                'message' => 'Service Not Found'
-            ]);
-        }
-
-        return response()->json([
-            'status' => true,
-            'data' => $service
-        ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Service $service)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
-    {
-
-        $service = Service::find($id);
-
-        if ($service == null) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Service Not Found'
+                'message' => 'Project Not Found'
             ]);
         }
 
         $request->merge(['slug' => Str::slug($request->slug)]);
         $validator = Validator::make($request->all(), [
             'title' => 'required',
-            'slug' => 'required|unique:services,slug,' . $id . ',id'
+            'slug' => 'required|unique:projects,slug,' . $id . ',id'
         ]);
-
         if ($validator->fails()) {
             return response()->json([
                 'status' => false,
@@ -144,75 +108,88 @@ class ServiceController extends Controller
             ]);
         }
 
-        $service->title = $request->title;
-        $service->short_desc = $request->short_desc;
-        $service->slug = Str::slug($request->slug);
-        $service->content = $request->content;
-        $service->status = $request->status;
-        $service->save();
 
-        //Save TempImg Here
+        $project->title = $request->title;
+        $project->slug = Str::slug($request->slug);
+        $project->short_desc = $request->short_desc;
+        $project->content = $request->content;
+        $project->construction_type = $request->construction_type;
+        $project->sector = $request->sector;
+        $project->status = $request->status;
+        $project->location = $request->location;
+        $project->save();
+
         if ($request->imageId > 0) {
-            $oldImage = $service->image;
+            $oldImage = $project->image;
             $tempImage = TempImage::find($request->imageId);
             if ($tempImage != null) {
                 $extArray = explode('.', $tempImage->name);
                 $ext = last($extArray);
 
-                $fileName = strtotime('now') . $service->id . '.' . $ext;
+                $fileName = strtotime('now') . $project->id . '.' . $ext;
 
                 // Create Small Thumbnail Here
                 $sourcePath = public_path('uploads/temp/' . $tempImage->name);
-                $destPath = public_path('uploads/services/small/' . $fileName);
+                $destPath = public_path('uploads/projects/small/' . $fileName);
                 $manager = new ImageManager(Driver::class);
                 $image = $manager->read($sourcePath);
                 $image->coverDown(500, 600);
                 $image->save($destPath);
 
                 // Create Large Thumbnail Here
-                $destPath = public_path('uploads/services/large/' . $fileName);
+                $destPath = public_path('uploads/projects/large/' . $fileName);
                 $manager = new ImageManager(Driver::class);
                 $image = $manager->read($sourcePath);
                 $image->scaleDown(1200);
                 $image->save($destPath);
 
-                $service->image = $fileName;
-                $service->save();
+                $project->image = $fileName;
+                $project->save();
             }
             if ($oldImage != '') {
-                File::delete(public_path('uploads/services/large/' . $oldImage));
-                File::delete(public_path('uploads/services/small/' . $oldImage));
+                File::delete(public_path('uploads/projects/large/' . $oldImage));
+                File::delete(public_path('uploads/projects/small/' . $oldImage));
             }
         }
 
         return response()->json([
             'status' => true,
-            'message' => 'Service Updated Successfully'
+            'errors' => 'Project Updated Sucessfully'
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        $service = Service::find($id);
-
-        if ($service == null) {
+    public function show($id) {
+        $project = Project::find($id);
+        if ($project == null) {
             return response()->json([
                 'status' => false,
-                'message' => 'Service Not Found'
+                'message' => 'Project Not Found'
             ]);
         }
 
-        File::delete(public_path('uploads/services/large/' . $service->image));
-        File::delete(public_path('uploads/services/small/' . $service->image));
-
-        $service->delete();
-
         return response()->json([
-            'status' => true,
-            'message' => 'Service Deleted Succesfully'
-        ]);
+                'status' => true,
+                'data' => $project
+            ]);
+    }
+
+    public function destroy($id) {
+        $project = Project::find($id);
+        if ($project == null) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Project Not Found'
+            ]);
+        }
+
+        File::delete(public_path('uploads/projects/large/' . $project->image));
+        File::delete(public_path('uploads/projects/small/' . $project->image));
+
+        $project->delete();
+        
+        return response()->json([
+                'status' => true,
+                'message' => 'Project Deleted Succesfully'
+            ]);
     }
 }
