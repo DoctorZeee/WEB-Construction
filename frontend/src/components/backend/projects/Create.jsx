@@ -1,14 +1,14 @@
-import React, { useState, useRef, useMemo } from "react";
-import Header from "../../common/Header";
-import Footer from "../../common/Footer";
-import Sidebar from "../../common/Sidebar";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useMemo, useRef, useState } from 'react'
+import Header from '../../common/Header'
+import Footer from '../../common/Footer'
+import Sidebar from '../../common/Sidebar'
+import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from "react-hook-form";
 import { apiUrl, token } from "../../common/http";
 import { toast } from "react-toastify";
 import JoditEditor from "jodit-react";
 
-const Create = ({placeholder}) => {
+const Create = ({ placeholder }) => {
     const editor = useRef(null);
     const [content, setContent] = useState("");
     const [isDisable, setIsDisable] = useState(false);
@@ -30,8 +30,8 @@ const Create = ({placeholder}) => {
     } = useForm();
     const navigate = useNavigate();
     const onSubmit = async (data) => {
-        const newData = {...data,"content":content, "imageId":imageId}
-        const res = await fetch(apiUrl + "services", {
+        const newData = { ...data, "content": content, "imageId": imageId }
+        const res = await fetch(apiUrl + "projects", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -43,9 +43,9 @@ const Create = ({placeholder}) => {
 
         const result = await res.json();
 
-        if (result.status == true) {
+        if (result.status === true) {
             toast.success(result.message);
-            navigate("/admin/services");
+            navigate("/admin/projects");
         } else {
             toast.error(result.message);
         }
@@ -54,7 +54,7 @@ const Create = ({placeholder}) => {
     const handleFile = async (e) => {
         const formData = new FormData();
         const file = e.target.files[0];
-        formData.append("image",file);
+        formData.append("image", file);
         setIsDisable(true);
 
         // https://web-project.ddev.site/api/temp-images
@@ -66,15 +66,15 @@ const Create = ({placeholder}) => {
             },
             body: formData
         })
-        .then(response => response.json())
-        .then(result => {
-            setIsDisable(false);
-            if(result.status == false){
-                toast.error(result.errors.image[0]);
-            }else{
-                setImageId(result.data.id)
-            }
-        });
+            .then(response => response.json())
+            .then(result => {
+                setIsDisable(false);
+                if (result.status == false) {
+                    toast.error(result.errors.image[0]);
+                } else {
+                    setImageId(result.data.id)
+                }
+            });
     }
 
     return (
@@ -93,10 +93,10 @@ const Create = ({placeholder}) => {
                                 <div className="card-body p-4">
                                     <div className="d-flex justify-content-between">
                                         <h4 className="h5">
-                                            Services / Create
+                                            Project / Create
                                         </h4>
                                         <Link
-                                            to="/admin/services"
+                                            to="/admin/projects"
                                             className="btn btn-primary"
                                         >
                                             Back
@@ -109,7 +109,7 @@ const Create = ({placeholder}) => {
                                                 htmlFor=""
                                                 className="form-label"
                                             >
-                                                Name
+                                                Title
                                             </label>
                                             <input
                                                 placeholder="Title"
@@ -118,9 +118,8 @@ const Create = ({placeholder}) => {
                                                         "The title field is required",
                                                 })}
                                                 type="text"
-                                                className={`form-control ${
-                                                    errors.title && "is-invalid"
-                                                }`}
+                                                className={`form-control ${errors.title && "is-invalid"
+                                                    }`}
                                             />
                                             {errors.title && (
                                                 <p className="invalid-feedback">
@@ -142,9 +141,8 @@ const Create = ({placeholder}) => {
                                                     required:
                                                         "The slug field is required",
                                                 })}
-                                                className={`form-control ${
-                                                    errors.slug && "is-invalid"
-                                                }`}
+                                                className={`form-control ${errors.slug && "is-invalid"
+                                                    }`}
                                             />
                                             {errors.slug && (
                                                 <p className="invalid-feedback">
@@ -152,6 +150,82 @@ const Create = ({placeholder}) => {
                                                 </p>
                                             )}
                                         </div>
+
+                                        <div className='row'>
+                                            <div className='col-md-6'>
+                                                <div className="mb-3">
+                                                    <label
+                                                        htmlFor=""
+                                                        className="form-label"
+                                                    >
+                                                        Location
+                                                    </label>
+                                                    <input
+                                                        placeholder="Location"
+                                                        type="text"
+                                                        {
+                                                        ...register("location")
+
+                                                        }
+                                                        className={`form-control`}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className='col-md-6'>
+                                                <div className="mb-3">
+                                                    <label htmlFor="" className="form-label">
+                                                        Construction Type
+                                                    </label>
+                                                    <select className="form-control"
+                                                    {...register("construction_type")}
+                                                    >
+                                                        <option value="">Construction Type</option>
+                                                        <option value="Residential construction">Residential construction</option>
+                                                        <option value="Commercial construction">Commercial  construction</option>
+                                                        <option value="Industrial construction">Industrial  construction</option>
+                                                        <option value="Infrastructure construction">Infrastructure  construction</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className='row'>
+                                            <div className='col-md-6'>
+                                                <div className="mb-3">
+                                                    <label htmlFor="" className="form-label">
+                                                        Sector
+                                                    </label>
+                                                    <select className="form-control"
+                                                    {...register("sector")}
+                                                    >
+                                                        <option value="">Sector</option>
+                                                        <option value="Health">Health</option>
+                                                        <option value="Education">Education</option>
+                                                        <option value="Corporate">Corporate</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div className='col-md-6'>
+                                                <div className="mb-3">
+                                            <label
+                                                htmlFor=""
+                                                className="form-label"
+                                            >
+                                                Status
+                                            </label>
+                                            <select
+                                                className="form-control "
+                                                {...register("status")}
+                                            >
+                                                <option value="1">
+                                                    Active
+                                                </option>
+                                                <option value="0">Block</option>
+                                            </select>
+                                        </div>
+                                            </div>
+                                        </div>
+
                                         <div className="mb-3">
                                             <label
                                                 htmlFor=""
@@ -181,7 +255,7 @@ const Create = ({placeholder}) => {
                                                 onBlur={(newContent) =>
                                                     setContent(newContent)
                                                 } // preferred to use only this option to update the content for performance reasons
-                                                onChange={(newContent) => {}}
+                                                onChange={(newContent) => { }}
                                             />
                                         </div>
                                         <div className="mb-3">
@@ -194,23 +268,7 @@ const Create = ({placeholder}) => {
                                             <br />
                                             <input onChange={handleFile} type="file" />
                                         </div>
-                                        <div className="mb-3">
-                                            <label
-                                                htmlFor=""
-                                                className="form-label"
-                                            >
-                                                Status
-                                            </label>
-                                            <select
-                                                className="form-control "
-                                                {...register("status")}
-                                            >
-                                                <option value="1">
-                                                    Active
-                                                </option>
-                                                <option value="0">Block</option>
-                                            </select>
-                                        </div>
+                                        
                                         <button disabled={isDisable} className="btn btn-primary">
                                             Submit
                                         </button>
@@ -223,7 +281,7 @@ const Create = ({placeholder}) => {
             </main>
             <Footer />
         </>
-    );
-};
+    )
+}
 
-export default Create;
+export default Create
